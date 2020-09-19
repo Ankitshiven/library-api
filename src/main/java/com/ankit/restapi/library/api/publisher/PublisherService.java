@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.ankit.restapi.library.api.exception.LibraryResourceAlreadyExistException;
 import com.ankit.restapi.library.api.exception.LibraryResourceNotFoundException;
+import com.ankit.restapi.library.api.util.LibraryAPIUtils;
 
 @Service
 public class PublisherService {
@@ -50,6 +51,28 @@ public class PublisherService {
 
 	private Publisher createPublisherFromEntity(PublisherEntity pe) {
 		return new Publisher(pe.getPublisherId(),pe.getName(),pe.getEmailId(),pe.getPhoneNumber());
+	}
+
+	public Publisher updatePublisher(Publisher publisherToBeUpdated) throws LibraryResourceNotFoundException {
+		Optional<PublisherEntity> publisherEntity = publisherRepository.findById(publisherToBeUpdated.getPublisherId());
+	    // Publisher publisher =null;
+	     if(publisherEntity.isPresent()) {
+	    	 PublisherEntity pe = publisherEntity.get();
+	    	 if(LibraryAPIUtils.doesStrValExist(publisherToBeUpdated.getEmailId())) {
+	    		 pe.setEmailId(publisherToBeUpdated.getEmailId());
+	    	 }
+	    	 if(LibraryAPIUtils.doesStrValExist(publisherToBeUpdated.getPhoneNumber())) {
+	    		 pe.setPhoneNumber(publisherToBeUpdated.getPhoneNumber());
+	    	 }
+	    	 publisherRepository.save(pe);
+	    	 publisherToBeUpdated = createPublisherFromEntity(pe);
+	     }
+	     else {
+	    	 throw new LibraryResourceNotFoundException("PublisherId :"+ publisherToBeUpdated.getPublisherId() + "Not Found");
+	     }
+	     
+	     
+		return null;
 	}
 
 }
