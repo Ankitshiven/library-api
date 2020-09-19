@@ -3,6 +3,7 @@ package com.ankit.restapi.library.api.publisher;
 import java.util.Optional;
 
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import com.ankit.restapi.library.api.exception.LibraryResourceAlreadyExistException;
@@ -73,6 +74,15 @@ public class PublisherService {
 	     
 	     
 		return null;
+	}
+
+	public void deletePublisher(Integer publisherId) throws LibraryResourceNotFoundException {
+       try {
+		publisherRepository.deleteById(publisherId);
+       }
+       catch (EmptyResultDataAccessException e) {
+    	   throw new LibraryResourceNotFoundException("PublisherId :"+ publisherId + " Not Found");
+       }
 	}
 
 }
