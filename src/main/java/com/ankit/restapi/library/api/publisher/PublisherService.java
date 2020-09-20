@@ -1,6 +1,10 @@
 package com.ankit.restapi.library.api.publisher;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -83,6 +87,26 @@ public class PublisherService {
        catch (EmptyResultDataAccessException e) {
     	   throw new LibraryResourceNotFoundException("PublisherId :"+ publisherId + " Not Found");
        }
+	}
+
+	public List<Publisher> searchPublisher(String name) {
+		List<PublisherEntity> publisherEntities =null;
+		if(LibraryAPIUtils.doesStrValExist(name)) {
+			publisherEntities = publisherRepository.findByNameContaining(name);
+		}
+		if(publisherEntities != null && publisherEntities.size() > 0) {
+			return createPublishersSearchResponse(publisherEntities);
+		}
+		else {
+		return Collections.EMPTY_LIST;
+		}
+	}
+
+	private List<Publisher> createPublishersSearchResponse(List<PublisherEntity> publisherEntities) {
+
+		return publisherEntities.stream()
+				.map(pe -> createPublisherFromEntity(pe))
+				.collect(Collectors.toList());
 	}
 
 }
